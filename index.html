@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Roteiro • SP + RJ 2026</title>
+<meta name="description" content="Roteiro de viagem São Paulo, Rio de Janeiro, Cabo Frio e Búzios">
+<meta name="theme-color" content="#0E3B43">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Roteiro">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16302F;
+    --ink-soft:#4C635F;
+    --ocean:#0E3B43;
+    --ocean-mid:#1B7A72;
+    --coral:#FF6B4A;
+    --coral-dark:#E4553A;
+    --gold:#F2B705;
+    --bg:#EFF3F0;
+    --card:#FFFFFF;
+    --line:rgba(14,59,67,0.10);
+    --line-strong:rgba(14,59,67,0.18);
+    --shadow:0 8px 24px rgba(14,59,67,0.10);
+    --r-sp:#F2B705;
+    --r-itu:#7A8B4C;
+    --r-rio:#1B7A72;
+    --r-cabo:#2E8FCB;
+    --r-buzios:#FF6B4A;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Work Sans', sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+  }
+  h1,h2,h3,.display{font-family:'Fraunces', serif;}
+  button{font-family:inherit;}
+  ::selection{background:var(--gold);color:var(--ink);}
+
+  #app-frame{
+    width:100%;
+    max-width:480px;
+    min-height:100vh;
+    background:var(--bg);
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 0 60px rgba(14,59,67,0.12);
+  }
+  @media (min-width:520px){
+    body{padding:24px 0;}
+    #app-frame{min-height:calc(100vh - 48px);border-radius:28px;overflow:hidden;}
+  }
+
+  /* HEADER */
+  header.top{
+    padding:calc(16px + var(--safe-top)) 20px 14px;
+    background:linear-gradient(160deg, var(--ocean) 0%, #0A2C33 100%);
+    color:#F3F6F2;
+    border-radius:0 0 24px 24px;
+  }
+  .top-row{display:flex; justify-content:space-between; align-items:flex-start; gap:12px;}
+  .top-row h1{font-size:21px; font-weight:600; margin:0; line-height:1.15; letter-spacing:0.2px;}
+  .top-row h1 span{display:block; font-size:12.5px; font-family:'Work Sans'; font-weight:500; color:#BFE0DA; margin-top:3px;}
+  .countdown{
+    text-align:right; flex-shrink:0;
+  }
+  .countdown .num{font-family:'Fraunces'; font-size:26px; font-weight:600; color:var(--gold); line-height:1;}
+  .countdown .lbl{font-size:10.5px; color:#BFE0DA; margin-top:2px;}
+
+  .couple-switch{
+    margin-top:16px;
+    display:flex;
+    background:rgba(255,255,255,0.08);
+    border-radius:12px;
+    padding:3px;
+    gap:2px;
+  }
+  .couple-switch button{
+    flex:1; border:none; background:transparent; color:#CFE4DF;
+    font-size:12.5px; font-weight:600; padding:8px 4px; border-radius:9px;
+    cursor:pointer; transition:background .18s ease, color .18s ease;
+  }
+  .couple-switch button.active{background:#F3F6F2; color:var(--ocean);}
+
+  /* DAY CHIPS */
+  .day-scroller{
+    display:flex; gap:8px; overflow-x:auto; padding:14px 16px 4px;
+    scrollbar-width:none;
+  }
+  .day-scroller::-webkit-scrollbar{display:none;}
+  .day-chip{
+    flex:0 0 auto; background:var(--card); border:1px solid var(--line);
+    border-radius:14px; padding:8px 12px 7px; text-align:center; cursor:pointer;
+    min-width:56px;
+  }
+  .day-chip .dow{font-size:10px; color:var(--ink-soft); text-transform:lowercase; margin-bottom:2px;}
+  .day-chip .dd{font-family:'Fraunces'; font-weight:600; font-size:16px;}
+  .day-chip .dot{width:5px;height:5px;border-radius:50%;margin:4px auto 0;}
+  .day-chip.active{background:var(--ocean); border-color:var(--ocean);}
+  .day-chip.active .dow, .day-chip.active .dd{color:#fff;}
+  .day-chip.today{box-shadow:0 0 0 2px var(--gold) inset;}
+
+  .region-banner{
+    margin:10px 16px 0; font-size:12px; font-weight:600; color:var(--ink-soft);
+    display:flex; align-items:center; gap:6px;
+  }
+  .region-banner .dot{width:8px;height:8px;border-radius:50%;}
+
+  /* MAIN SCROLL AREA */
+  main{flex:1; overflow-y:auto; padding:14px 16px 100px;}
+  .empty-state{
+    text-align:center; padding:60px 20px; color:var(--ink-soft);
+  }
+  .empty-state .big{font-size:34px; margin-bottom:8px;}
+
+  .timeline{position:relative;}
+  .activity{
+    position:relative;
+    display:flex; gap:12px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:12px 12px 12px 0;
+    margin-bottom:10px;
+    align-items:flex-start;
+  }
+  .activity.done{opacity:0.55;}
+  .activity.done .a-title{text-decoration:line-through;}
+  .a-time-col{
+    flex:0 0 62px; text-align:center; padding-top:10px; border-right:1px solid var(--line);
+  }
+  .a-time-col .t{font-family:'Fraunces'; font-weight:600; font-size:14px;}
+  .a-check{
+    width:22px;height:22px;border-radius:50%;border:2px solid var(--line-strong);
+    margin:8px auto 0; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    font-size:12px; color:transparent; background:#fff; transition:all .15s ease;
+  }
+  .activity.done .a-check{background:var(--ocean-mid); border-color:var(--ocean-mid); color:#fff;}
+  .a-body{flex:1; padding:2px 8px 0 4px; min-width:0;}
+  .a-head{display:flex; align-items:flex-start; gap:8px;}
+  .a-icon{font-size:19px; line-height:1.3;}
+  .a-title{font-weight:600; font-size:15px; flex:1; word-break:break-word;}
+  .a-loc{
+    display:inline-flex; align-items:center; gap:4px; font-size:12px; color:var(--ocean-mid);
+    text-decoration:none; margin-top:3px; font-weight:600;
+  }
+  .a-notes{font-size:12.5px; color:var(--ink-soft); margin-top:5px; line-height:1.45;}
+  .a-couple-tag{
+    display:inline-block; font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px;
+    margin-top:6px; letter-spacing:0.2px;
+  }
+  .tag-will{background:#DDEFE9; color:#0E5C56;}
+  .tag-joao{background:#FFE3DA; color:#B8442C;}
+  .a-actions{display:flex; flex-direction:column; gap:6px; padding-top:4px;}
+  .a-actions button{
+    border:none; background:transparent; color:var(--ink-soft); cursor:pointer; font-size:15px;
+    padding:2px; opacity:.7;
+  }
+  .a-actions button:hover{opacity:1;}
+
+  /* FAB */
+  .fab{
+    position:fixed; right:calc(50% - 240px + 20px); bottom:calc(84px + var(--safe-bottom));
+    width:52px; height:52px; border-radius:50%; background:var(--coral); color:#fff;
+    border:none; font-size:26px; box-shadow:0 10px 24px rgba(255,107,74,0.45);
+    cursor:pointer; z-index:20; display:flex; align-items:center; justify-content:center;
+  }
+  @media (max-width:519px){ .fab{right:20px;} }
+  .fab:active{transform:scale(0.94);}
+
+  /* BOTTOM NAV */
+  nav.bottom{
+    position:sticky; bottom:0; z-index:15;
+    display:flex; background:var(--card); border-top:1px solid var(--line);
+    padding:8px 6px calc(8px + var(--safe-bottom));
+  }
+  nav.bottom button{
+    flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center;
+    gap:3px; color:var(--ink-soft); font-size:10.5px; font-weight:600; cursor:pointer; padding:4px;
+  }
+  nav.bottom button .ic{font-size:19px;}
+  nav.bottom button.active{color:var(--ocean-mid);}
+
+  /* PAGES (extras/settings) */
+  .page-section{margin-bottom:22px;}
+  .page-section h2{font-size:16px; margin:0 0 10px; display:flex; align-items:center; gap:7px;}
+  .card-block{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px;}
+  .check-item{display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid var(--line);}
+  .check-item:last-child{border-bottom:none;}
+  .check-item input[type=checkbox]{width:18px;height:18px; accent-color:var(--ocean-mid);}
+  .check-item span{flex:1; font-size:14px;}
+  .check-item.done span{text-decoration:line-through; color:var(--ink-soft);}
+  .check-item button{border:none; background:none; color:var(--ink-soft); cursor:pointer; opacity:.6;}
+  .row-input{display:flex; gap:8px; margin-top:10px;}
+  .row-input input, .row-input select{
+    flex:1; padding:10px 12px; border-radius:10px; border:1px solid var(--line-strong); font-size:14px; font-family:inherit;
+  }
+  .row-input button{
+    background:var(--ocean); color:#fff; border:none; border-radius:10px; padding:0 16px; font-weight:600; cursor:pointer;
+  }
+  .budget-item{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--line); font-size:13.5px;}
+  .budget-item:last-child{border-bottom:none;}
+  .budget-item .who{font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:20px; margin-left:6px;}
+  .budget-total{display:flex; justify-content:space-between; font-weight:700; margin-top:10px; font-size:15px;}
+  textarea.notes-area{
+    width:100%; min-height:140px; border:1px solid var(--line-strong); border-radius:12px; padding:12px;
+    font-family:inherit; font-size:13.5px; line-height:1.6; resize:vertical;
+  }
+  .settings-btn{
+    width:100%; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:14px; font-size:14px; font-weight:600; margin-bottom:10px; cursor:pointer; display:flex;
+    align-items:center; gap:10px; color:var(--ink);
+  }
+  .settings-btn.danger{color:var(--coral-dark);}
+  .hidden{display:none !important;}
+
+  /* MODAL */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(14,30,29,0.55); z-index:50;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  .modal-sheet{
+    width:100%; max-width:480px; background:var(--bg); border-radius:22px 22px 0 0;
+    padding:18px 20px calc(20px + var(--safe-bottom)); max-height:88vh; overflow-y:auto;
+    animation:slideUp .22s ease-out;
+  }
+  @keyframes slideUp{from{transform:translateY(24px); opacity:0;} to{transform:translateY(0); opacity:1;}}
+  .modal-sheet h3{margin:0 0 14px; font-size:18px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:12px; font-weight:600; color:var(--ink-soft); margin-bottom:5px;}
+  .field input, .field textarea, .field select{
+    width:100%; padding:10px 12px; border-radius:10px; border:1px solid var(--line-strong);
+    font-family:inherit; font-size:14px;
+  }
+  .field textarea{min-height:64px; resize:vertical;}
+  .two-col{display:flex; gap:10px;}
+  .two-col .field{flex:1;}
+  .emoji-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px;}
+  .emoji-row button{
+    width:34px; height:34px; border-radius:9px; border:1px solid var(--line-strong); background:#fff;
+    font-size:16px; cursor:pointer;
+  }
+  .emoji-row button.sel{background:var(--gold); border-color:var(--gold);}
+  .modal-actions{display:flex; gap:10px; margin-top:16px;}
+  .btn-primary{flex:1; background:var(--ocean); color:#fff; border:none; border-radius:12px; padding:13px; font-weight:700; font-size:14.5px; cursor:pointer;}
+  .btn-ghost{flex:1; background:transparent; color:var(--ink-soft); border:1px solid var(--line-strong); border-radius:12px; padding:13px; font-weight:600; cursor:pointer;}
+  .btn-delete{background:none; border:none; color:var(--coral-dark); font-weight:600; font-size:13px; cursor:pointer; margin-top:4px;}
+
+  .toast{
+    position:fixed; bottom:calc(96px + var(--safe-bottom)); left:50%; transform:translateX(-50%);
+    background:var(--ink); color:#fff; padding:10px 18px; border-radius:30px; font-size:13px;
+    z-index:60; opacity:0; pointer-events:none; transition:opacity .25s ease;
+  }
+  .toast.show{opacity:1;}
+
+  @media (prefers-reduced-motion: reduce){
+    .modal-sheet{animation:none;}
+  }
+</style>
+</head>
+<body>
+<div id="app-frame">
+
+  <header class="top">
+    <div class="top-row">
+      <h1>Rio &amp; São Paulo<span id="tripSubtitle">15 — 27 de setembro, 2026</span></h1>
+      <div class="countdown"><div class="num" id="countdownNum">—</div><div class="lbl" id="countdownLbl">faltam</div></div>
+    </div>
+    <div class="couple-switch" id="coupleSwitch"></div>
+  </header>
+
+  <div id="roteiroView">
+    <div class="day-scroller" id="dayScroller"></div>
+    <div class="region-banner" id="regionBanner"></div>
+    <main><div class="timeline" id="timeline"></div></main>
+  </div>
+
+  <div id="extrasView" class="hidden">
+    <main>
+      <div class="page-section">
+        <h2>🎒 Checklist de bagagem</h2>
+        <div class="card-block">
+          <div id="checklistItems"></div>
+          <div class="row-input">
+            <input type="text" id="newChecklistInput" placeholder="Adicionar item...">
+            <button onclick="addChecklistItem()">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-section">
+        <h2>💰 Gastos da viagem</h2>
+        <div class="card-block">
+          <div id="budgetItems"></div>
+          <div class="budget-total"><span>Total</span><span id="budgetTotal">R$ 0,00</span></div>
+          <div class="row-input">
+            <input type="text" id="newBudgetDesc" placeholder="Descrição">
+            <input type="number" id="newBudgetValue" placeholder="R$" style="max-width:80px;">
+          </div>
+          <div class="row-input">
+            <select id="newBudgetWho">
+              <option value="ambos">Ambos</option>
+              <option value="will">Will &amp; Vick</option>
+              <option value="joao">João &amp; Wivi</option>
+            </select>
+            <button onclick="addBudgetItem()" style="flex:0 0 auto; padding:0 18px;">Adicionar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="page-section">
+        <h2>📌 Informações importantes</h2>
+        <div class="card-block">
+          <textarea class="notes-area" id="importantNotes" onchange="saveImportantNotes()"></textarea>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="settingsView" class="hidden">
+    <main>
+      <div class="page-section">
+        <h2>⚙️ Ajustes</h2>
+        <button class="settings-btn" onclick="exportData()">⬇️ &nbsp; Exportar backup (.json)</button>
+        <button class="settings-btn" onclick="document.getElementById('importFile').click()">⬆️ &nbsp; Importar backup (.json)</button>
+        <input type="file" id="importFile" accept="application/json" class="hidden" onchange="importData(event)">
+        <button class="settings-btn" onclick="installHint()">📲 &nbsp; Adicionar à tela de início</button>
+        <button class="settings-btn danger" onclick="resetData()">♻️ &nbsp; Restaurar roteiro original</button>
+      </div>
+      <div class="page-section">
+        <h2>ℹ️ Sobre</h2>
+        <div class="card-block" style="font-size:13px; color:var(--ink-soft); line-height:1.6;">
+          Os dados ficam salvos apenas neste navegador/celular. Use "Exportar backup" depois de editar
+          o roteiro e envie o arquivo .json para o outro casal importar, para manter os dois aparelhos sincronizados.
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <button class="fab" id="fabAdd" onclick="openActivityModal()">+</button>
+
+  <nav class="bottom">
+    <button class="nav-btn active" data-view="roteiroView"><span class="ic">🗺️</span>Roteiro</button>
+    <button class="nav-btn" data-view="extrasView"><span class="ic">🎒</span>Extras</button>
+    <button class="nav-btn" data-view="settingsView"><span class="ic">⚙️</span>Ajustes</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------------------------------------------------
+   ROTEIRO DE VIAGEM — dados e lógica do app
+--------------------------------------------------------- */
+const STORAGE_KEY = 'roteiro-viagem-data-v1';
+const TRIP_START = '2026-09-15';
+const EMOJI_OPTIONS = ['✈️','🚗','🚤','🏖️','🏰','🌊','🍽️','🧳','☕','🎡','🚡','✝️','🌈','🐠','⚽','🔴⚫','🛍️','🏙️','🇰🇷','📸','❤️','🏛️','🌙','🔭','⛲','🌅','🎒','📌','🗺️'];
+
+function uid(){ return 'a' + Math.random().toString(36).slice(2,10); }
+
+function buildDefaultData(){
+  return {
+    selectedCouple: 'ambos',
+    activeDayId: null,
+    checklist: [
+      {id:uid(), text:'Protetor solar', done:false},
+      {id:uid(), text:'Roupa de banho (para todos os dias de praia)', done:false},
+      {id:uid(), text:'Câmera / GoPro', done:false},
+      {id:uid(), text:'Documentos, vouchers e reservas', done:false},
+      {id:uid(), text:'Carregador portátil', done:false},
+      {id:uid(), text:'Repelente', done:false},
+      {id:uid(), text:'Chapéu / boné', done:false},
+      {id:uid(), text:'Toalha de praia de secagem rápida', done:false},
+      {id:uid(), text:'Sandália extra', done:false},
+      {id:uid(), text:'Remédios básicos', done:false},
+    ],
+    budget: [],
+    importantNotes:
+`HOSPEDAGENS
+• América Granada Hotel — Rio — 19 a 22/09
+• Hotel Sesc Cabo Frio — 22 a 25/09
+• La Proeza Búzios — 25 a 26/09
+• Arosa Rio Hotel — 26 a 27/09
+
+VOOS
+• 15/09 — chegada em Guarulhos (SP) às 7h30
+• 19/09 — saída de Viracopos 11h30 → chegada Galeão (RJ) 12h35
+• 27/09 — saída pelo Santos Dumont às 17h
+
+CARRO
+• Retirada em 22/09 no Rio
+• Devolução em 27/09 (antes das 15h)`,
+    days: [
+      day('2026-09-15','São Paulo','sp',[
+        act('07:30','✈️','Chegada em Guarulhos','Aeroporto de Guarulhos, São Paulo','Voo pousa às 7h30'),
+        act('08:30','🧳','Check-in / deixar as malas no hotel','Hotel, São Paulo',''),
+        act('09:30','🛍️','Brás','Brás, São Paulo','Aproveitar o horário comercial, com calma'),
+        act('12:30','🍽️','Almoço','São Paulo',''),
+        act('14:00','🛍️','25 de Março','Rua 25 de Março, São Paulo','Reservar várias horas para pesquisar preços e comprar — evitar deixar para a madrugada'),
+        act('19:00','🌙','Noite livre','São Paulo',''),
+      ]),
+      day('2026-09-16','São Paulo','sp',[
+        act('09:00','🏙️','Sampa Sky','Sampa Sky, São Paulo','Comprar ingresso 🎟️ com antecedência'),
+        act('11:00','🇰🇷','Liberdade','Liberdade, São Paulo','Foco total em skincare coreano'),
+        act('13:00','🍽️','Almoço','São Paulo',''),
+        act('14:30','🌆','Avenida Paulista','Avenida Paulista, São Paulo',''),
+        act('15:30','📸','MASP / Japan House','MASP, São Paulo','Caminhada pela Paulista'),
+        act('19:30','🌙','Jantar','São Paulo',''),
+      ]),
+      day('2026-09-17','São Paulo → Itu','sp',[
+        act('08:00','☕','Café da manhã','São Paulo',''),
+        act('09:00','🧳','Check-out do hotel','São Paulo',''),
+        act('09:30','🛍️','Finalizar compras, se faltou algo','São Paulo',''),
+        act('12:30','🍽️','Almoço','São Paulo',''),
+        act('14:00','🚗','Saída para Itu','São Paulo',''),
+        act('16:00','❤️','Chegada à casa da avó','Itu, SP',''),
+      ]),
+      day('2026-09-18','Itu','itu',[
+        act('09:00','❤️','Dia com a avó','Itu, SP',''),
+        act('14:00','🏛️','Centro de Itu','Itu, SP','Se quiserem'),
+        act('16:00','📸','Praça dos Exageros','Praça dos Exageros, Itu','Se estiverem com disposição'),
+      ]),
+      day('2026-09-19','Itu → Rio de Janeiro','rio',[
+        act('07:00','☕','Café da manhã','Itu, SP',''),
+        act('08:00','🚗','Itu → Aeroporto de Viracopos','Viracopos, Campinas',''),
+        act('11:30','✈️','Voo para o Rio','Aeroporto de Viracopos',''),
+        act('12:35','✈️','Chegada ao Rio (Galeão)','Aeroporto Galeão, Rio de Janeiro',''),
+        act('15:30','🌊','Orla de Copacabana','Copacabana, Rio de Janeiro',''),
+        act('16:15','🏰','Forte de Copacabana','Forte de Copacabana, Rio de Janeiro',''),
+        act('18:00','🎡','Roda-Gigante UP Star','UP Star Roda Gigante, Rio de Janeiro','No horário do ingresso'),
+        act('20:00','🍽️','Jantar','Rio de Janeiro',''),
+      ]),
+      day('2026-09-20','Rio de Janeiro','rio',[
+        act('05:30','🌅','Nascer do sol + Stand Up Paddle','Praia Vermelha, Rio de Janeiro',''),
+        act('08:30','☕','Café da manhã','Rio de Janeiro',''),
+        act('09:00','🐠','AquaRio','AquaRio, Rio de Janeiro','Com a criança'),
+        act('12:00','🍽️','Almoço','Rio de Janeiro',''),
+        act('13:00','🌈','Escadaria Selarón','Escadaria Selarón, Rio de Janeiro',''),
+        act('14:30','🔴⚫','Museu do Flamengo','Museu do Flamengo, Rio de Janeiro',''),
+        act('16:00','🚗','Saída para o Maracanã','Rio de Janeiro',''),
+        act('17:30','⚽','Jogo Flamengo x Bragantino','Estádio do Maracanã',''),
+      ]),
+      day('2026-09-21','Rio de Janeiro','rio',[
+        act('08:00','☕','Café da manhã','Rio de Janeiro',''),
+        act('09:30','🚡','Pão de Açúcar','Pão de Açúcar, Rio de Janeiro',''),
+        act('12:30','🍽️','Almoço','Rio de Janeiro',''),
+        act('13:30','🌈','Escadaria Selarón + Lapa','Lapa, Rio de Janeiro',''),
+        act('15:00','🚗','Saída para o Cristo','Rio de Janeiro',''),
+        act('16:00','✝️','Cristo Redentor','Cristo Redentor, Rio de Janeiro','Ver o pôr do sol 🌅'),
+        act('19:30','🍽️','Jantar','Rio de Janeiro',''),
+      ]),
+      day('2026-09-22','Rio → Cabo Frio','cabo',[
+        act('07:00','☕','Café / check-out','Rio de Janeiro',''),
+        act('08:00','🚗','Retirada do carro','Rio de Janeiro',''),
+        act('08:30','🚗','Saída para Cabo Frio','Rio de Janeiro',''),
+        act('12:00','🧳','Chegada + deixar malas no Sesc','Hotel Sesc, Cabo Frio',''),
+        act('12:30','🍽️','Almoço','Cabo Frio',''),
+        act('14:00','🏖️','Praia do Forte','Praia do Forte, Cabo Frio',''),
+        act('16:00','🏰','Forte São Mateus','Forte São Mateus, Cabo Frio',''),
+        act('17:00','⛲','Praça das Águas','Praça das Águas, Cabo Frio',''),
+        act('19:30','🌙','Bairro da Passagem + jantar','Bairro da Passagem, Cabo Frio',''),
+      ]),
+      day('2026-09-23','Arraial do Cabo','cabo',[
+        act('07:00','☕','Café da manhã','Cabo Frio',''),
+        act('07:30','🚗','Saída de Cabo Frio','Cabo Frio',''),
+        act('08:00','🏖️','Prainhas do Pontal do Atalaia','Prainhas do Pontal do Atalaia, Arraial do Cabo','Uma das principais praias — imperdível'),
+        act('10:30','🏖️','Praia do Forno','Praia do Forno, Arraial do Cabo','Trilha/caminhada até a praia'),
+        act('12:30','🍽️','Almoço','Arraial do Cabo',''),
+        act('14:00','🏖️','Praia Grande','Praia Grande, Arraial do Cabo',''),
+        act('15:30','🔭','Mirante da Boa Vista','Mirante da Boa Vista, Arraial do Cabo',''),
+        act('17:00','🚗','Retorno para Cabo Frio','Cabo Frio',''),
+        act('20:00','🍽️','Jantar tranquilo','Cabo Frio',''),
+      ]),
+      day('2026-09-24','Cabo Frio — Lancha','cabo',[
+        act('10:00','🚤','Passeio de lancha','Cabo Frio','Canal do Itajuru • Ilha do Japonês • Praia do Forte • Ilha dos Papagaios • 2 paradas de mergulho • fotos • churrasco'),
+        act('17:00','🏠','Retorno','Cabo Frio',''),
+        act('19:30','🍽️','Jantar (noite tranquila)','Cabo Frio',''),
+      ]),
+      day('2026-09-25','Cabo Frio → Búzios','buzios',[
+        act('08:00','☕','Café da manhã','Cabo Frio',''),
+        act('09:00','🧳','Check-out','Cabo Frio',''),
+        act('09:30','🏖️','Praia do Peró','Praia do Peró, Cabo Frio',''),
+        act('11:00','🏖️','Praia das Conchas','Praia das Conchas, Cabo Frio',''),
+        act('12:30','🍽️','Almoço','Cabo Frio',''),
+        act('14:00','🚗','Saída para Búzios','Cabo Frio',''),
+        act('15:00','🏨','Chegada / check-in','La Proeza Búzios',''),
+        act('16:00','🌊','Orla Bardot','Orla Bardot, Búzios',''),
+        act('17:00','🛍️','Rua das Pedras','Rua das Pedras, Búzios',''),
+        act('20:00','🍽️','Jantar','Búzios',''),
+      ]),
+      day('2026-09-26','Búzios → Rio','rio',[
+        act('07:30','☕','Café da manhã + preparar malas','Búzios',''),
+        act('08:30','🏖️','João Fernandes','Praia de João Fernandes, Búzios',''),
+        act('10:00','🌊','Azeda e Azedinha','Praia da Azeda, Búzios',''),
+        act('12:00','🧳','Check-out (deixar malas na recepção)','Búzios',''),
+        act('12:30','🍽️','Almoço','Búzios',''),
+        act('13:30','🚶','Orla Bardot + Rua das Pedras','Búzios','Comprinhas e fotos'),
+        act('15:00','🏨','Pegar as malas','Búzios',''),
+        act('16:00','🚗','Saída de Búzios','Búzios',''),
+      ]),
+      day('2026-09-27','Rio de Janeiro','rio',[
+        act('08:00','☕','Café da manhã','Rio de Janeiro',''),
+        act('09:00','🧳','Check-out do hotel','Rio de Janeiro',''),
+        act('09:30','🏙️','Centro do Rio: Praça Mauá + Museu do Amanhã (área externa) + Boulevard Olímpico','Praça Mauá, Rio de Janeiro','Alternativa: Escadaria Selarón + Arcos da Lapa'),
+        act('11:30','🍽️','Almoço','Rio de Janeiro',''),
+        act('12:30','🚗','Saída para devolver o carro','Rio de Janeiro',''),
+        act('14:00','🚙','Devolução do carro','Rio de Janeiro',''),
+        act('17:00','✈️','Voo pelo Santos Dumont','Aeroporto Santos Dumont, Rio de Janeiro',''),
+      ]),
+    ],
+  };
+}
+function day(date,label,region,activities){ return {id:uid(), date, label, region, activities}; }
+function act(time,icon,title,location,notes){ return {id:uid(), time, icon, title, location, notes, couple:'ambos', done:false}; }
+
+const REGION_META = {
+  sp:{name:'São Paulo', color:'var(--r-sp)'},
+  itu:{name:'Itu', color:'var(--r-itu)'},
+  rio:{name:'Rio de Janeiro', color:'var(--r-rio)'},
+  cabo:{name:'Cabo Frio / Arraial', color:'var(--r-cabo)'},
+  buzios:{name:'Búzios', color:'var(--r-buzios)'},
+};
+const COUPLE_META = {
+  ambos:{name:'Ambos'},
+  will:{name:'Will & Vick'},
+  joao:{name:'João & Wivi'},
+};
+
+let DATA = load();
+if(!DATA.activeDayId && DATA.days.length) DATA.activeDayId = closestDayId();
+
+function load(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ console.warn('Falha ao ler dados salvos', e); }
+  const fresh = buildDefaultData();
+  persist(fresh);
+  return fresh;
+}
+function persist(d){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }catch(e){ console.warn('Falha ao salvar', e); }
+}
+function save(){ persist(DATA); }
+
+function closestDayId(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  let best = DATA.days[0];
+  let bestDiff = Infinity;
+  DATA.days.forEach(d=>{
+    const dd = new Date(d.date+'T00:00:00');
+    const diff = Math.abs(dd - today);
+    if(diff < bestDiff){ bestDiff = diff; best = d; }
+  });
+  return best.id;
+}
+
+/* ---------------- RENDER: HEADER ---------------- */
+function renderCountdown(){
+  const start = new Date(TRIP_START+'T00:00:00');
+  const end = new Date(DATA.days[DATA.days.length-1].date+'T00:00:00');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const numEl = document.getElementById('countdownNum');
+  const lblEl = document.getElementById('countdownLbl');
+  const oneDay = 86400000;
+  if(today < start){
+    numEl.textContent = Math.round((start-today)/oneDay);
+    lblEl.textContent = 'dias p/ viajar';
+  }else if(today <= end){
+    const dayNum = Math.round((today-start)/oneDay)+1;
+    numEl.textContent = dayNum+'/'+DATA.days.length;
+    lblEl.textContent = 'dia da viagem';
+  }else{
+    numEl.textContent = '🎉';
+    lblEl.textContent = 'viagem realizada';
+  }
+}
+
+function renderCoupleSwitch(){
+  const el = document.getElementById('coupleSwitch');
+  el.innerHTML = '';
+  Object.entries(COUPLE_META).forEach(([key,meta])=>{
+    const b = document.createElement('button');
+    b.textContent = meta.name;
+    if(DATA.selectedCouple===key) b.classList.add('active');
+    b.onclick = ()=>{ DATA.selectedCouple=key; save(); renderAll(); };
+    el.appendChild(b);
+  });
+}
+
+/* ---------------- RENDER: DAY SCROLLER ---------------- */
+const DOW = ['dom','seg','ter','qua','qui','sex','sáb'];
+function renderDayScroller(){
+  const el = document.getElementById('dayScroller');
+  el.innerHTML = '';
+  const todayStr = new Date().toISOString().slice(0,10);
+  DATA.days.forEach(d=>{
+    const chip = document.createElement('div');
+    chip.className = 'day-chip' + (d.id===DATA.activeDayId?' active':'') + (d.date===todayStr?' today':'');
+    const dt = new Date(d.date+'T00:00:00');
+    chip.innerHTML = `<div class="dow">${DOW[dt.getDay()]}</div><div class="dd">${dt.getDate()}/${dt.getMonth()+1}</div><div class="dot" style="background:${REGION_META[d.region].color}"></div>`;
+    chip.onclick = ()=>{ DATA.activeDayId = d.id; save(); renderAll(); };
+    el.appendChild(chip);
+  });
+  const activeChip = el.querySelector('.active');
+  if(activeChip) activeChip.scrollIntoView({inline:'center', block:'nearest'});
+}
+
+function getActiveDay(){ return DATA.days.find(d=>d.id===DATA.activeDayId) || DATA.days[0]; }
+
+function renderRegionBanner(){
+  const d = getActiveDay();
+  const meta = REGION_META[d.region];
+  document.getElementById('regionBanner').innerHTML =
+    `<span class="dot" style="background:${meta.color}"></span> ${d.label} — ${meta.name}`;
+}
+
+/* ---------------- RENDER: TIMELINE ---------------- */
+function visibleActivities(day){
+  return day.activities
+    .filter(a => DATA.selectedCouple==='ambos' ? true : (a.couple==='ambos' || a.couple===DATA.selectedCouple))
+    .slice()
+    .sort((a,b)=> a.time.localeCompare(b.time));
+}
+
+function renderTimeline(){
+  const d = getActiveDay();
+  const el = document.getElementById('timeline');
+  const items = visibleActivities(d);
+  if(items.length===0){
+    el.innerHTML = `<div class="empty-state"><div class="big">🌴</div>Nenhuma atividade neste dia ainda.<br>Toque em "+" para adicionar.</div>`;
+    return;
+  }
+  el.innerHTML = items.map(a=>{
+    const tagHtml = a.couple!=='ambos' ? `<span class="a-couple-tag tag-${a.couple}">${COUPLE_META[a.couple].name}</span>` : '';
+    const mapsUrl = a.location ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.location)}` : null;
+    return `
+    <div class="activity ${a.done?'done':''}">
+      <div class="a-time-col">
+        <div class="t">${a.time}</div>
+        <div class="a-check" onclick="toggleDone('${d.id}','${a.id}')">${a.done?'✓':''}</div>
+      </div>
+      <div class="a-body">
+        <div class="a-head"><span class="a-icon">${a.icon||'📍'}</span><span class="a-title">${escapeHtml(a.title)}</span></div>
+        ${mapsUrl?`<a class="a-loc" href="${mapsUrl}" target="_blank" rel="noopener">📍 ${escapeHtml(a.location)}</a>`:''}
+        ${a.notes?`<div class="a-notes">${escapeHtml(a.notes)}</div>`:''}
+        ${tagHtml}
+      </div>
+      <div class="a-actions">
+        <button onclick="openActivityModal('${d.id}','${a.id}')" title="Editar">✏️</button>
+        <button onclick="deleteActivity('${d.id}','${a.id}')" title="Excluir">🗑️</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s||''; return d.innerHTML; }
+
+function toggleDone(dayId, actId){
+  const d = DATA.days.find(x=>x.id===dayId);
+  const a = d.activities.find(x=>x.id===actId);
+  a.done = !a.done;
+  save(); renderTimeline();
+}
+function deleteActivity(dayId, actId){
+  if(!confirm('Excluir esta atividade?')) return;
+  const d = DATA.days.find(x=>x.id===dayId);
+  d.activities = d.activities.filter(x=>x.id!==actId);
+  save(); renderTimeline();
+  showToast('Atividade excluída');
+}
+
+/* ---------------- MODAL: ADD/EDIT ACTIVITY ---------------- */
+let modalCtx = {dayId:null, actId:null, icon:'📍'};
+function openActivityModal(dayId, actId){
+  dayId = dayId || getActiveDay().id;
+  const d = DATA.days.find(x=>x.id===dayId);
+  const editing = !!actId;
+  const a = editing ? d.activities.find(x=>x.id===actId) : {time:'09:00', icon:'📍', title:'', location:'', notes:'', couple:'ambos'};
+  modalCtx = {dayId, actId, icon:a.icon};
+
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  overlay.id = 'modalOverlay';
+  overlay.innerHTML = `
+    <div class="modal-sheet">
+      <h3>${editing?'Editar atividade':'Nova atividade'} — ${d.label}</h3>
+      <div class="two-col">
+        <div class="field"><label>Horário</label><input type="time" id="mTime" value="${a.time}"></div>
+        <div class="field"><label>Para quem</label>
+          <select id="mCouple">
+            <option value="ambos" ${a.couple==='ambos'?'selected':''}>Ambos</option>
+            <option value="will" ${a.couple==='will'?'selected':''}>Will &amp; Vick</option>
+            <option value="joao" ${a.couple==='joao'?'selected':''}>João &amp; Wivi</option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label>Título</label><input type="text" id="mTitle" value="${escapeHtml(a.title)}" placeholder="Ex: Cristo Redentor"></div>
+      <div class="field"><label>Local (para abrir no mapa)</label><input type="text" id="mLocation" value="${escapeHtml(a.location)}" placeholder="Ex: Cristo Redentor, Rio de Janeiro"></div>
+      <div class="field"><label>Notas</label><textarea id="mNotes" placeholder="Detalhes, horários, dicas...">${escapeHtml(a.notes)}</textarea></div>
+      <div class="field"><label>Ícone</label>
+        <div class="emoji-row" id="emojiRow"></div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeModal()">Cancelar</button>
+        <button class="btn-primary" onclick="saveActivityModal()">${editing?'Salvar':'Adicionar'}</button>
+      </div>
+      ${editing?`<button class="btn-delete" onclick="deleteActivity('${dayId}','${actId}'); closeModal();">Excluir atividade</button>`:''}
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) closeModal(); });
+
+  const emojiRow = overlay.querySelector('#emojiRow');
+  EMOJI_OPTIONS.forEach(em=>{
+    const b = document.createElement('button');
+    b.type='button'; b.textContent=em;
+    if(em===modalCtx.icon) b.classList.add('sel');
+    b.onclick = ()=>{ modalCtx.icon = em; emojiRow.querySelectorAll('button').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); };
+    emojiRow.appendChild(b);
+  });
+}
+function closeModal(){
+  const o = document.getElementById('modalOverlay');
+  if(o) o.remove();
+}
+function saveActivityModal(){
+  const time = document.getElementById('mTime').value || '00:00';
+  const couple = document.getElementById('mCouple').value;
+  const title = document.getElementById('mTitle').value.trim();
+  const location = document.getElementById('mLocation').value.trim();
+  const notes = document.getElementById('mNotes').value.trim();
+  if(!title){ alert('Dê um título para a atividade.'); return; }
+  const d = DATA.days.find(x=>x.id===modalCtx.dayId);
+  if(modalCtx.actId){
+    const a = d.activities.find(x=>x.id===modalCtx.actId);
+    Object.assign(a, {time, icon:modalCtx.icon, title, location, notes, couple});
+  }else{
+    d.activities.push({id:uid(), time, icon:modalCtx.icon, title, location, notes, couple, done:false});
+  }
+  save();
+  closeModal();
+  renderTimeline();
+  showToast('Roteiro atualizado');
+}
+
+/* ---------------- EXTRAS: CHECKLIST ---------------- */
+function renderChecklist(){
+  const el = document.getElementById('checklistItems');
+  if(DATA.checklist.length===0){ el.innerHTML = '<p style="color:var(--ink-soft); font-size:13px;">Nenhum item ainda.</p>'; return; }
+  el.innerHTML = DATA.checklist.map(it=>`
+    <div class="check-item ${it.done?'done':''}">
+      <input type="checkbox" ${it.done?'checked':''} onchange="toggleChecklist('${it.id}')">
+      <span>${escapeHtml(it.text)}</span>
+      <button onclick="removeChecklist('${it.id}')">✕</button>
+    </div>`).join('');
+}
+function addChecklistItem(){
+  const input = document.getElementById('newChecklistInput');
+  const text = input.value.trim();
+  if(!text) return;
+  DATA.checklist.push({id:uid(), text, done:false});
+  input.value='';
+  save(); renderChecklist();
+}
+function toggleChecklist(id){
+  const it = DATA.checklist.find(x=>x.id===id); it.done=!it.done; save(); renderChecklist();
+}
+function removeChecklist(id){
+  DATA.checklist = DATA.checklist.filter(x=>x.id!==id); save(); renderChecklist();
+}
+
+/* ---------------- EXTRAS: BUDGET ---------------- */
+function renderBudget(){
+  const el = document.getElementById('budgetItems');
+  if(DATA.budget.length===0){ el.innerHTML='<p style="color:var(--ink-soft); font-size:13px;">Nenhum gasto registrado.</p>'; }
+  else{
+    el.innerHTML = DATA.budget.map(b=>`
+      <div class="budget-item">
+        <span>${escapeHtml(b.desc)} ${b.who!=='ambos'?`<span class="who tag-${b.who}">${COUPLE_META[b.who].name}</span>`:''}</span>
+        <span style="display:flex; align-items:center; gap:8px;">R$ ${Number(b.value).toFixed(2)}
+          <button onclick="removeBudget('${b.id}')" style="border:none;background:none;color:var(--ink-soft);cursor:pointer;">✕</button>
+        </span>
+      </div>`).join('');
+  }
+  const total = DATA.budget.reduce((s,b)=>s+Number(b.value||0),0);
+  document.getElementById('budgetTotal').textContent = 'R$ ' + total.toFixed(2);
+}
+function addBudgetItem(){
+  const desc = document.getElementById('newBudgetDesc').value.trim();
+  const value = parseFloat(document.getElementById('newBudgetValue').value);
+  const who = document.getElementById('newBudgetWho').value;
+  if(!desc || isNaN(value)){ alert('Preencha a descrição e o valor.'); return; }
+  DATA.budget.push({id:uid(), desc, value, who});
+  document.getElementById('newBudgetDesc').value='';
+  document.getElementById('newBudgetValue').value='';
+  save(); renderBudget();
+}
+function removeBudget(id){ DATA.budget = DATA.budget.filter(x=>x.id!==id); save(); renderBudget(); }
+
+/* ---------------- EXTRAS: NOTES ---------------- */
+function renderImportantNotes(){
+  document.getElementById('importantNotes').value = DATA.importantNotes || '';
+}
+function saveImportantNotes(){
+  DATA.importantNotes = document.getElementById('importantNotes').value;
+  save();
+  showToast('Notas salvas');
+}
+
+/* ---------------- SETTINGS ---------------- */
+function exportData(){
+  const blob = new Blob([JSON.stringify(DATA,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'roteiro-viagem-backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Backup exportado');
+}
+function importData(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      if(!parsed.days) throw new Error('formato inválido');
+      DATA = parsed;
+      save();
+      renderAll();
+      showToast('Backup importado com sucesso');
+    }catch(err){
+      alert('Não foi possível ler esse arquivo de backup.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+function resetData(){
+  if(!confirm('Isso vai apagar suas edições e restaurar o roteiro original. Continuar?')) return;
+  DATA = buildDefaultData();
+  DATA.activeDayId = closestDayId();
+  save();
+  renderAll();
+  showToast('Roteiro restaurado');
+}
+function installHint(){
+  alert('No Android/Chrome: toque no menu (⋮) e escolha "Adicionar à tela inicial".\n\nNo iPhone/Safari: toque em Compartilhar (□↑) e escolha "Adicionar à Tela de Início".');
+}
+
+/* ---------------- NAV / VIEWS ---------------- */
+function switchView(viewId){
+  ['roteiroView','extrasView','settingsView'].forEach(id=>{
+    document.getElementById(id).classList.toggle('hidden', id!==viewId);
+  });
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active', b.dataset.view===viewId));
+  document.getElementById('fabAdd').classList.toggle('hidden', viewId!=='roteiroView');
+}
+document.querySelectorAll('.nav-btn').forEach(b=>{
+  b.addEventListener('click', ()=>switchView(b.dataset.view));
+});
+
+/* ---------------- TOAST ---------------- */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ---------------- RENDER ALL ---------------- */
+function renderAll(){
+  renderCountdown();
+  renderCoupleSwitch();
+  renderDayScroller();
+  renderRegionBanner();
+  renderTimeline();
+  renderChecklist();
+  renderBudget();
+  renderImportantNotes();
+}
+renderAll();
+
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
