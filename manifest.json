@@ -1,0 +1,14 @@
+{
+  "name": "Roteiro de Viagem — SP + RJ",
+  "short_name": "Roteiro",
+  "description": "Roteiro de viagem São Paulo, Rio de Janeiro, Cabo Frio e Búzios",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EFF3F0",
+  "theme_color": "#0E3B43",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
